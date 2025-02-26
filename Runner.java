@@ -6,13 +6,24 @@ public class Runner {
 		 int pID = 0;
 		 int arriveT = 0;
 		 int burstT;
-		 boolean c = true;
-		 do {
-			 
-			 
-		 }while(c);
+	     int pNum;
+	     System.out.println("Welcome to CSC227 platform\n"
+	     		+ "Enter the number of your processes: ");
+	     pNum = input.nextInt();
+	     
+	     Process [] p = new Process[pNum];
+	     
+	    for(int i = 1 ; i <= pNum; i++) {
+	    	pID = i;
+	    	System.out.printf("Enter the burst time of P%d: \n",i);
+	    	burstT = input.nextInt();
+	    	p[i-1] = new Process(pID,arriveT,burstT);
+	    	arriveT++;
+	    	
+	    }
 		 
 
 	}
 
 }
+
