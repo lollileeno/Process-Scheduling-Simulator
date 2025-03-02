@@ -1,4 +1,5 @@
 
+
 public class Process {
 	int processID;
 	int arrivalTime;
@@ -6,7 +7,7 @@ public class Process {
 	int completionTime;
 	int waitingTime;
 	int turnaroundTime;
-	int remainingTime;
+	int remainingTime; //it is the remaining time of burst time
 	public Process(int processID, int arrivalTime, int burstTime) {
 		this.processID = processID;
 		this.arrivalTime = arrivalTime;
@@ -15,7 +16,22 @@ public class Process {
 		
 	}
 	
+	  public void setCompletionTime(int end) {
+	    	completionTime = end;
+	    	
+	    }
 
 	
-
+    public void calculateTurnaroundTime() {
+    	turnaroundTime = completionTime - arrivalTime;
+    	
+    }
+    
+    
+    public void calculateWaitingTime() {
+    	waitingTime = turnaroundTime  - burstTime;
+    	
+    }
+    
+  
 }
