@@ -24,17 +24,13 @@ public class Runner {
 		 
 
 	}
-	public static int processingTime(Process [] p){
+public static int processingTime(Process [] p){
 		int CS = 1;   //refer to context switch time
-		int i = 0;
+		
 		int processing = 0;
-		while(i<p.length-1) {
-			if(p[i].burstTime<=p[i+1].burstTime)
-			processing+=(p[i].burstTime + p[i+1].burstTime + CS);
-			else
-				processing +=(p[i].burstTime - p[i+1].burstTime + CS);
-			
-			i++;
+		Process[] p2 = sortShortest(p);
+		for(int i = 0 ; i<p2.length ; i++) {
+			processing+=p2[i].burstTime + CS;
 		}
 		
 		return processing;
