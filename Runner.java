@@ -24,6 +24,21 @@ public class Runner {
 		 
 
 	}
+	public static int processingTime(Process [] p){
+		int CS = 1;   //refer to context switch time
+		int i = 0;
+		int processing = 0;
+		while(i<p.length-1) {
+			if(p[i].burstTime<=p[i+1].burstTime)
+			processing+=(p[i].burstTime + p[i+1].burstTime + CS);
+			else
+				processing +=(p[i].burstTime - p[i+1].burstTime + CS);
+			
+			i++;
+		}
+		
+		return processing;
+	}
 
 }
 
