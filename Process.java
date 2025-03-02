@@ -6,10 +6,12 @@ public class Process {
 	int completionTime;
 	int waitingTime;
 	int turnaroundTime;
+	int remainingTime;
 	public Process(int processID, int arrivalTime, int burstTime) {
 		this.processID = processID;
 		this.arrivalTime = arrivalTime;
 		this.burstTime = burstTime;
+		remainingTime = burstTime;
 		
 	}
 	
