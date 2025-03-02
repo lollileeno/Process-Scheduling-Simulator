@@ -40,5 +40,11 @@ public class Runner {
 		return processing;
 	}
 
+		public static Process[] sortShortest(Process[] p) {
+	    Process[] p2 = Arrays.copyOf(p, p.length); // Copy original array to avoid modifying it
+	    Arrays.sort(p2, Comparator.comparingInt(process -> process.burstTime)); // Sort by burst time
+	    return p2;
+	}
+
 }
 
