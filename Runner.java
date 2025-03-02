@@ -42,5 +42,10 @@ public static int processingTime(Process [] p){
 	    return p2;
 	}
 
+	public static void displayInfo(Process []p) {
+		
+		
+	}
+
 }
 
