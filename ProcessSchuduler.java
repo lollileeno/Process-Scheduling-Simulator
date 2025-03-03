@@ -59,7 +59,7 @@ public static int processingTime(Process [] p){
 	}
 
 	public static void SchuduleProcesses(Process[] p) {
-	    p = sortArrival(p); // Ensure processes are sorted by arrival time
+	    p = sortArrival(p); // Sort processes by arrival time
 
 	    PriorityQueue<Process> remainQueue = new PriorityQueue<>(Comparator.comparingInt(proc -> proc.remainingTime));
 
@@ -71,53 +71,51 @@ public static int processingTime(Process [] p){
 	    int contextSwitches = 0;
 	    int i = 0;
 	    Process currentProcess = null;
+	    Process lastProcess = null; // Track the last executed process
 
 	    System.out.println("\nTime  Process/CS");
 
 	    while (completed < p.length) {
-	        // Add all processes that have arrived at this time
+	        // Add processes that have arrived at this time
 	        while (i < p.length && p[i].arrivalTime <= time) {
 	            remainQueue.add(p[i]);
 	            i++;
 	        }
 
+	        // Reinsert the running process if it was preempted
 	        if (currentProcess != null && currentProcess.remainingTime > 0) {
-	            remainQueue.add(currentProcess); // Reinsert the currently running process if preempted
+	            remainQueue.add(currentProcess);
 	        }
 
 	        if (!remainQueue.isEmpty()) {
-	            Process nextProcess = remainQueue.poll(); // Select the process with the shortest remaining time
+	            Process nextProcess = remainQueue.poll();
 
-	            // 🔹 Context Switch must happen between each two different processes
-	            if (currentProcess != null && currentProcess != nextProcess) {
-	            	 contextSwitches++;
+	            // 🔹 Context Switch if switching to a different process
+	            if (lastProcess != null && nextProcess != lastProcess) {
 	                System.out.printf("%d-%d  CS\n", time, time + 1);
 	                time++; // 1ms context switch delay
-	                
+	                contextSwitches++;
 	            }
+	            lastProcess = nextProcess; // Update lastProcess to the new one
 
 	            int startTime = time;
 
-	            // 🔹 **Fixed Process Execution Loop**
+	            // 🔹 Execute process 1ms at a time to allow preemptions
 	            while (nextProcess.remainingTime > 0) {
-	                nextProcess.remainingTime--;
+	                nextProcess.remainingTime--; // Execute for 1ms
 	                time++;
 	                totalExecutionTime++;
 
-	                // Add newly arriving processes to the queue
+	                // Add newly arriving processes
 	                while (i < p.length && p[i].arrivalTime == time) {
 	                    remainQueue.add(p[i]);
 	                    i++;
 	                }
 
-	                // **Check for preemption: If a shorter process arrives, perform context switch**
+	                // 🔹 Preempt immediately if a shorter job arrives
 	                if (!remainQueue.isEmpty() && nextProcess.remainingTime > remainQueue.peek().remainingTime) {
-	                    // Context switch happens immediately
-	                    contextSwitches++;
-	                    System.out.printf("%d-%d  CS\n", time, time + 1);
-	                    time++; // 1ms context switch
 	                    currentProcess = nextProcess;
-	                    break; // Stop executing this process and allow preemption
+	                    break; // Stop execution and allow preemption
 	                }
 	            }
 
@@ -131,12 +129,12 @@ public static int processingTime(Process [] p){
 	                totalWaitingTime += nextProcess.waitingTime;
 	                totalTurnaroundTime += nextProcess.turnaroundTime;
 	                completed++;
-	                currentProcess = null; // Process finished, reset
+	                currentProcess = null; // Process finished
 	            } else {
-	                currentProcess = nextProcess; // Process preempted, store it for the next iteration
+	                currentProcess = nextProcess; // Process was preempted
 	            }
 	        } else {
-	            time++; // CPU is idle
+	            time++; // CPU idle time
 	        }
 	    }
 
