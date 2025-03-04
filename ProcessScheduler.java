@@ -141,7 +141,7 @@ public class ProcessScheduler {
 
 		double cpuUtilization = ((double) totalExecutionTime / time) * 100;
 
-		// 🔹 Print Performance Metrics
+		// Print Performance Metrics
 		System.out.println("\nPerformance Metrics");
 		System.out.printf("Average Turnaround Time: %.2f\n", (double) totalTurnaroundTime / p.length);
 		System.out.printf("Average Waiting Time: %.2f\n", (double) totalWaitingTime / p.length);
