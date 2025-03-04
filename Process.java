@@ -2,12 +2,12 @@
 
 public class Process {
 	int processID;
-	int arrivalTime;
+	public int arrivalTime;
 	int burstTime;
 	int completionTime;
 	int waitingTime;
 	int turnaroundTime;
-	int remainingTime; //it is the remaining time of burst time
+	public int remainingTime; //it is the remaining time of burst time
 	public Process(int processID, int arrivalTime, int burstTime) {
 		this.processID = processID;
 		this.arrivalTime = arrivalTime;
