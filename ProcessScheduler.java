@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class ProcessSchuduler {
+public class ProcessScheduler {
 	static int CS = 1;// 1ms context switch
 
 	public static void main(String[] args) {
@@ -9,9 +9,12 @@ public class ProcessSchuduler {
 		int arriveT;
 		int burstT;
 		int pNum;
-		System.out.println("Welcome to CSC227 platform\n" + "Enter the number of your processes: ");
+		boolean entry = true;
+		System.out.println("Welcome to CSC227 platform");
+		do {
+		System.out.println("Enter the number of your processes: ");
 		pNum = input.nextInt();
-
+     if(pNum>0) {
 		Process[] p = new Process[pNum];
 
 		for (int i = 1; i <= pNum; i++) {
@@ -24,32 +27,21 @@ public class ProcessSchuduler {
 
 		}
 		displayInfo(p);
-		SchuduleProcesses(p);
-		// FCFS
-		// SJRF
+		ScheduleProcesses(p);
+		entry = false;
+     }
+     else
+    	 System.out.println("Enter the number of your processes:");
+     pNum = input.nextInt();
+		}  
+     while(entry);
+		
 
-	}
-
-	public static int processingTime(Process[] p) {
-
-		int processing = 0;
-		Process[] p2 = sortShortest(p);
-		for (int i = 0; i < p2.length; i++) {
-			processing += p2[i].burstTime + CS;
-		}
-
-		return processing;
-	}
-
-	public static Process[] sortShortest(Process[] p) {
-		Process[] p2 = Arrays.copyOf(p, p.length); // Copy original array to avoid modifying it
-		Arrays.sort(p2, Comparator.comparingInt(process -> process.burstTime)); // Sort by burst time
-		return p2;
 	}
 
 	public static void displayInfo(Process[] p) {
 		System.out.print("Number of proccesses= " + (p.length));
-		System.out.print("(");
+		System.out.print(" (");
 		for (int j = 0; j < p.length; j++) {
 			System.out.print("P" + p[j].processID);
 			if (j < p.length - 1) {
@@ -67,7 +59,7 @@ public class ProcessSchuduler {
 
 	}
 
-	public static void SchuduleProcesses(Process[] p) {
+	public static void ScheduleProcesses(Process[] p) {
 		PriorityQueue<Process> remainQueue = new PriorityQueue<>( // sort by remaining time, if equal -> FIFO
 				Comparator.<Process>comparingInt(proc -> proc.remainingTime)
 						.thenComparingInt(proc -> proc.arrivalTime));
@@ -99,9 +91,9 @@ public class ProcessSchuduler {
 			if (!remainQueue.isEmpty()) {
 				Process nextProcess = remainQueue.poll();
 
-				// 🔹 Context Switch if switching to a different process
+				// Context Switch if switching to a different process
 				if (lastProcess != null && nextProcess != lastProcess) {
-					System.out.printf("%d-%d  CS\n", time, time + 1);
+					System.out.printf("%d-%d   CS\n", time, time + 1);
 					time = time + CS;
 					contextSwitches++;
 				}
@@ -109,7 +101,7 @@ public class ProcessSchuduler {
 
 				int startTime = time;
 
-				// 🔹 Execute process 1ms at a time to allow preemptions
+				// Execute process 1ms at a time to allow preemptions
 				while (nextProcess.remainingTime > 0) {
 					nextProcess.remainingTime--; // Execute for 1ms
 					time++;
@@ -121,14 +113,14 @@ public class ProcessSchuduler {
 						i++;
 					}
 
-					// 🔹 Preempt immediately if a shorter job arrives
+					// Preempt immediately if a shorter job arrives
 					if (!remainQueue.isEmpty() && nextProcess.remainingTime > remainQueue.peek().remainingTime) {
 						currentProcess = nextProcess;
 						break; // Stop execution and allow preemption
 					}
 				}
 
-				System.out.printf("%d-%d P%d\n", startTime, time, nextProcess.processID);
+				System.out.printf("%d-%d   P%d\n", startTime, time, nextProcess.processID);
 
 				if (nextProcess.remainingTime == 0) {
 					nextProcess.setCompletionTime(time);
