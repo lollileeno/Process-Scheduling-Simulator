@@ -62,7 +62,7 @@ public class ProcessScheduler {
 
 	}
 
-public static void ScheduleProcesses(Process[] p) {
+	public static void ScheduleProcesses(Process[] p) {
 	    // Sort processes by arrival time to handle them in order
 	    Arrays.sort(p, Comparator.comparingInt(proc -> proc.arrivalTime));
 
@@ -75,7 +75,7 @@ public static void ScheduleProcesses(Process[] p) {
 		int totalExecutionTime = 0;
 		int totalWaitingTime = 0;
 		int totalTurnaroundTime = 0;
-		int contextSwitches = 0;
+		
 		int i = 0;
 		Process currentProcess = null;
 		Process lastProcess = null; // Track the last executed process
@@ -101,7 +101,7 @@ public static void ScheduleProcesses(Process[] p) {
 				if (lastProcess != null && nextProcess != lastProcess) {
 					System.out.printf("%d-%d   CS\n", time, time + 1);
 					time = time + CS;
-					contextSwitches++;
+					
 				}
 				lastProcess = nextProcess; // Update lastProcess to the new one
 
