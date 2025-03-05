@@ -2,21 +2,32 @@ import java.util.*;
 
 public class ProcessScheduler {
 	static int CS = 1;// 1ms context switch
-
+	
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
-		int pID = 0;
+		int pID;
 		int arriveT;
 		int burstT;
 		int pNum;
-		boolean entry = true;
-		System.out.println("Welcome to CSC227 platform");
-		do {
-		System.out.println("Enter the number of your processes: ");
-		pNum = input.nextInt();
-     if(pNum>0) {
-		Process[] p = new Process[pNum];
 
+		System.out.println("Welcome to CSC227 platform");
+
+		
+		while (true) {
+			System.out.println("Enter the number of your processes: ");
+			if (input.hasNextInt()) {
+				pNum = input.nextInt();
+				if (pNum > 0) {
+					break; // Exit loop if valid input
+				}
+			} else {
+				input.next(); // Consume invalid input
+			}
+			System.out.println("Invalid input. Please enter a positive integer.");
+		}
+
+		// Read processes
+		Process[] p = new Process[pNum];
 		for (int i = 1; i <= pNum; i++) {
 			pID = i;
 			System.out.printf("Enter the arrival time of P%d: \n", i);
@@ -24,21 +35,14 @@ public class ProcessScheduler {
 			System.out.printf("Enter the burst time of P%d: \n", i);
 			burstT = input.nextInt();
 			p[i - 1] = new Process(pID, arriveT, burstT);
-
 		}
+
+		input.close(); // Close scanner to prevent resource leaks
+
 		displayInfo(p);
 		ScheduleProcesses(p);
-		entry = false;
-     }
-     else
-    	 System.out.println("Enter the number of your processes:");
-     pNum = input.nextInt();
-		}  
-     while(entry);
-		
-
 	}
-
+	
 	public static void displayInfo(Process[] p) {
 		System.out.print("Number of proccesses= " + (p.length));
 		System.out.print(" (");
