@@ -59,10 +59,13 @@ public class ProcessScheduler {
 
 	}
 
-	public static void ScheduleProcesses(Process[] p) {
-		PriorityQueue<Process> remainQueue = new PriorityQueue<>( // sort by remaining time, if equal -> FIFO
-				Comparator.<Process>comparingInt(proc -> proc.remainingTime)
-						.thenComparingInt(proc -> proc.arrivalTime));
+public static void ScheduleProcesses(Process[] p) {
+	    // Sort processes by arrival time to handle them in order
+	    Arrays.sort(p, Comparator.comparingInt(proc -> proc.arrivalTime));
+
+	    PriorityQueue<Process> remainQueue = new PriorityQueue<>(
+	        Comparator.<Process>comparingInt(proc -> proc.remainingTime)
+	                .thenComparingInt(proc -> proc.arrivalTime));
 
 		int time = 0;
 		int completed = 0;
