@@ -11,7 +11,6 @@ public class ProcessScheduler {
 		int pNum;
 
 		System.out.println("Welcome to CSC227 platform");
-
 		
 		while (true) {
 			System.out.println("Enter the number of your processes: ");
