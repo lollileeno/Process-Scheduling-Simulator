@@ -99,93 +99,103 @@ public class ProcessSchedulerEventDriven {
         System.out.println("Scheduling Algorithm: Shortest Remaining Time First \nContext switch: " + CS + " ms");
     }
 
-    public static void scheduleProcesses(Process[] processes) { // this method schedules processes using shortest
-                                                                // remaining time
+  public static void scheduleProcesses(Process[] processes) { // this method schedules processes using shortest
+         // remaining time
 
-        PriorityQueue<Process> remainQueue = new PriorityQueue<>(Comparator
-                .comparingInt((Process proc) -> proc.remainingTime).thenComparingInt(proc -> proc.arrivalTime)); // this sorts the priority queue based on
-                                                                                                                 // remaining time and if the remaining time
-                                                                                                                 // is equal then FIFO
+PriorityQueue<Process> remainQueue = new PriorityQueue<>(Comparator
+.comparingInt((Process proc) -> proc.remainingTime).thenComparingInt(proc -> proc.arrivalTime)); // this sorts the priority queue based on
+                                                          // remaining time and if the remaining time
+                                                          // is equal then FIFO
 
-        PriorityQueue<Event> eventQueue = new PriorityQueue<>(Comparator.comparingInt(e -> e.time)); // time in which
-                                                                                                     // the event occurred
+PriorityQueue<Event> eventQueue = new PriorityQueue<>(Comparator.comparingInt(e -> e.time));  // time in which
+                                              // the event occurred
 
-        int time = 0, totalExecutionTime = 0;
-        int totalWaitingTime = 0, totalTurnaroundTime = 0;
-        int startTime = 0;
-        Process lastProcess = null;
+int time = 0, totalExecutionTime = 0;
+int totalWaitingTime = 0, totalTurnaroundTime = 0;
+int startTime = 0;
+Process lastProcess = null;
 
-        for (Process pro : processes) { // adds arriving proccesses to event queue
-            eventQueue.add(new Event(pro.arrivalTime, Event.EventType.ARRIVAL, pro));
-        }
+for (Process pro : processes) { // adds arriving proccesses to event queue
+eventQueue.add(new Event(pro.arrivalTime, Event.EventType.ARRIVAL, pro));
+}
 
-        Event event = eventQueue.peek();
+Event event = eventQueue.peek();
 
-        while (event.type == Event.EventType.ARRIVAL && event.time > time) {// set start time to the first process
-                                                                            // arrival time
-            time++;
-            startTime++;
-        }
+while (event.type == Event.EventType.ARRIVAL && event.time > time) {// set start time to the first process
+                     // arrival time
+time++;
+startTime++;
+}
 
-        System.out.println("\nTime\tProcess/CS");
+System.out.println("\nTime\tProcess/CS");
 
-        while (!eventQueue.isEmpty()) {
-            event = eventQueue.poll();
-            if (event.type == Event.EventType.ARRIVAL) { // adds event to remain queue
-                remainQueue.add(event.process);
-            }
+while (!eventQueue.isEmpty()) {
+event = eventQueue.poll();
+Event event2 = eventQueue.peek();
+if (event.type == Event.EventType.ARRIVAL) { 
+	if(event2.type == Event.EventType.ARRIVAL && event2.time == event.time){
+		eventQueue.poll();
+		remainQueue.add(event.process);
+		remainQueue.add(event2.process);// adds event to remain queue
+	}
+remainQueue.add(event.process);
+}
 
-            while (!remainQueue.isEmpty()) {
-                Process curProcess = remainQueue.peek();
+while (!remainQueue.isEmpty()) {
+Process curProcess = remainQueue.peek();
 
-                if (lastProcess != null && curProcess != lastProcess) { // when the code changes the process, a context
-                                                                        // switch occurs
-                    System.out.printf("%d-%d\tCS\n", time, time + CS);
-                    time += CS;
-                }
+if (lastProcess != null && curProcess != lastProcess) { // when the code changes the process, a context
+                 // switch occurs
+System.out.printf("%d-%d\tCS\n", time, time + CS);
+time += CS;
 
-                if (lastProcess != null && curProcess != lastProcess) // change start time when process changes
-                    startTime = time;
+}
 
-                lastProcess = curProcess;
+if (lastProcess != null && curProcess != lastProcess) // change start time when process changes
+startTime = time;
 
-                while (curProcess.remainingTime > 0) { // if current process has remaining time, we execute it until an
-                                                       // event occurs, and then we compare the upcoming event with the
-                                                       // current process then we start executing the heighest priority
-                                                       // process
-                    curProcess.remainingTime--;
-                    time++;
-                    totalExecutionTime++;
+lastProcess = curProcess;
 
-                    Event nextEvent = eventQueue.peek();
-                    if (nextEvent != null && nextEvent.type == Event.EventType.ARRIVAL && nextEvent.time <= time) {
-                        eventQueue.poll();
-                        remainQueue.add(nextEvent.process);
-                        if (remainQueue.peek().processID != curProcess.processID && curProcess.remainingTime != 0)
-                            System.out.printf("%d-%d\tP%d\n", startTime, time, curProcess.processID);
-                        break;
-                    }
-                }
+while (curProcess.remainingTime > 0) { // if current process has remaining time, we execute it until an
+// event occurs, and then we compare the upcoming event with the
+// current process then we start executing the heighest priority
+// process
+curProcess.remainingTime--;
+time++;
+totalExecutionTime++;
 
-                if (curProcess.remainingTime == 0) { // when the process is completed, we change its state (event) and
-                                                     // remove it from remainqueue
-                    curProcess.setCompletionTime(time);
-                    curProcess.calculateTurnaroundTime();
-                    curProcess.calculateWaitingTime();
-                    totalWaitingTime += curProcess.waitingTime;
-                    totalTurnaroundTime += curProcess.turnaroundTime;
-                    remainQueue.poll();
-                    eventQueue.add(new Event(curProcess.completionTime, Event.EventType.COMPLETION, curProcess));
-                    System.out.printf("%d-%d\tP%d\n", startTime, time, curProcess.processID);
-                }
-            }
-        }
+Event nextEvent = eventQueue.peek();
+if (nextEvent != null && nextEvent.type == Event.EventType.ARRIVAL && nextEvent.time <= time) {
+eventQueue.poll();
+remainQueue.add(nextEvent.process);
+if (remainQueue.peek().processID != curProcess.processID && curProcess.remainingTime != 0) 
+System.out.printf("%d-%d\tP%d\n", startTime, time, curProcess.processID);
+break;
+}
+}
 
-        double cpuUtilization = ((double) totalExecutionTime / time) * 100;
+if (curProcess.remainingTime == 0) { // when the process is completed, we change its state (event) and
+// remove it from remainqueue
+curProcess.setCompletionTime(time);
 
-        System.out.println("\nPerformance Metrics");
-        System.out.printf("Average Turnaround Time: %.2f\n", (double) totalTurnaroundTime / processes.length);
-        System.out.printf("Average Waiting Time: %.2f\n", (double) totalWaitingTime / processes.length);
-        System.out.printf("CPU Utilization: %.2f%%\n", cpuUtilization);
-    }
+totalWaitingTime += curProcess.waitingTime;
+totalTurnaroundTime += curProcess.turnaroundTime;
+remainQueue.poll();
+eventQueue.add(new Event(curProcess.completionTime, Event.EventType.COMPLETION, curProcess));
+System.out.printf("%d-%d\tP%d\n", startTime, time, curProcess.processID);
+}
+}
+}
+
+double cpuUtilization = ((double) totalExecutionTime / time) * 100;
+
+System.out.println("\nPerformance Metrics");
+System.out.printf("Average Turnaround Time: %.2f\n", (double) totalTurnaroundTime / processes.length);
+System.out.printf("Average Waiting Time: %.2f\n", (double) totalWaitingTime / processes.length);
+System.out.printf("CPU Utilization: %.2f%%\n", cpuUtilization);
+}
+	 
+
+	
+}
 }
