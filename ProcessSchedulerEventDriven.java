@@ -32,16 +32,10 @@ class Process { //this is the process class that stores the process information
         this.remainingTime = burstTime;
     }
 
-    public void setCompletionTime(int end) {
-        completionTime = end;
-    }
-
-    public void calculateTurnaroundTime() {
-        turnaroundTime = completionTime - arrivalTime;
-    }
-
-    public void calculateWaitingTime() {
-        waitingTime = turnaroundTime - burstTime;
+    public void setCompletionTime(int time) {
+        this.completionTime = time;
+        this.turnaroundTime = completionTime - arrivalTime;
+        this.waitingTime = turnaroundTime - burstTime;
     }
 }
 
