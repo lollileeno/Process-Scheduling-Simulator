@@ -99,7 +99,7 @@ public class ProcessSchedulerEventDriven {
         System.out.println("Scheduling Algorithm: Shortest Remaining Time First \nContext switch: " + CS + " ms");
     }
 
-  public static void scheduleProcesses(Process[] processes) { // this method schedules processes using shortest
+ 	 public static void scheduleProcesses(Process[] processes) { // this method schedules processes using shortest
          // remaining time
 
 PriorityQueue<Process> remainQueue = new PriorityQueue<>(Comparator
@@ -107,7 +107,7 @@ PriorityQueue<Process> remainQueue = new PriorityQueue<>(Comparator
                                                           // remaining time and if the remaining time
                                                           // is equal then FIFO
 
-PriorityQueue<Event> eventQueue = new PriorityQueue<>(Comparator.comparingInt(e -> e.time));  // time in which
+PriorityQueue<Event> eventQueue = new PriorityQueue<>(Comparator.comparingInt((Event e)-> e.time).thenComparingInt( e -> e.process.remainingTime));  // time in which
                                               // the event occurred
 
 int time = 0, totalExecutionTime = 0;
