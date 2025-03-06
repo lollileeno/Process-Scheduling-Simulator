@@ -1,7 +1,10 @@
 import java.util.*;
 
-class Event {
-    enum EventType { ARRIVAL, COMPLETION }
+class Event { //this class stores the state of the upcoming process
+    enum EventType {
+        ARRIVAL, COMPLETION
+    }
+
     int time;
     EventType type;
     Process process;
@@ -13,7 +16,7 @@ class Event {
     }
 }
 
-class Process {
+class Process { //this is the process class that stores the process information
     int processID;
     public int arrivalTime;
     int burstTime;
@@ -90,61 +93,67 @@ public class ProcessSchedulerEventDriven {
         System.out.println(")");
         System.out.println("Arrival times and burst times as follows: ");
         for (Process process : processes) {
-            System.out.println("P" + process.processID + ": Arrival time = " + process.arrivalTime +
-                    ", Burst time = " + process.burstTime + " ms");
+            System.out.println("P" + process.processID + ": Arrival time = " + process.arrivalTime + ", Burst time = "
+                    + process.burstTime + " ms");
         }
         System.out.println("Scheduling Algorithm: Shortest Remaining Time First \nContext switch: " + CS + " ms");
     }
 
-    public static void scheduleProcesses(Process[] processes) {
-        Arrays.sort(processes, Comparator.comparingInt(proc -> proc.arrivalTime));
+    public static void scheduleProcesses(Process[] processes) { // this method schedules processes using shortest
+                                                                // remaining time
 
-        PriorityQueue<Process> remainQueue = new PriorityQueue<>(
-                Comparator.comparingInt((Process proc) -> proc.remainingTime)
-                        .thenComparingInt(proc -> proc.arrivalTime));
+        PriorityQueue<Process> remainQueue = new PriorityQueue<>(Comparator
+                .comparingInt((Process proc) -> proc.remainingTime).thenComparingInt(proc -> proc.arrivalTime)); // this sorts the priority queue based on
+                                                                                                                 // remaining time and if the remaining time
+                                                                                                                 // is equal then FIFO
 
-        PriorityQueue<Event> eventQueue = new PriorityQueue<>(Comparator.comparingInt(e -> e.time));
+        PriorityQueue<Event> eventQueue = new PriorityQueue<>(Comparator.comparingInt(e -> e.time)); // time in which
+                                                                                                     // the event occurred
 
-        int time = 0, completed = 0, totalExecutionTime = 0;
+        int time = 0, totalExecutionTime = 0;
         int totalWaitingTime = 0, totalTurnaroundTime = 0;
         int startTime = 0;
         Process lastProcess = null;
 
-        for (Process pro : processes) {
+        for (Process pro : processes) { // adds arriving proccesses to event queue
             eventQueue.add(new Event(pro.arrivalTime, Event.EventType.ARRIVAL, pro));
         }
-        
+
         Event event = eventQueue.peek();
-        while (event.type == Event.EventType.ARRIVAL && event.time > time) {
+
+        while (event.type == Event.EventType.ARRIVAL && event.time > time) {// set start time to the first process
+                                                                            // arrival time
             time++;
             startTime++;
-            }
+        }
 
         System.out.println("\nTime\tProcess/CS");
 
         while (!eventQueue.isEmpty()) {
             event = eventQueue.poll();
-            if (event.type == Event.EventType.ARRIVAL) {
+            if (event.type == Event.EventType.ARRIVAL) { // adds event to remain queue
                 remainQueue.add(event.process);
             }
 
             while (!remainQueue.isEmpty()) {
-                Process nextProcess = remainQueue.peek();
+                Process curProcess = remainQueue.peek();
 
-                if (lastProcess != null && nextProcess != lastProcess) {
+                if (lastProcess != null && curProcess != lastProcess) { // when the code changes the process, a context
+                                                                        // switch occurs
                     System.out.printf("%d-%d\tCS\n", time, time + CS);
                     time += CS;
                 }
 
-
-                if (lastProcess != null && nextProcess != lastProcess)
+                if (lastProcess != null && curProcess != lastProcess) // change start time when process changes
                     startTime = time;
-                  
-                lastProcess = nextProcess;
-                
 
-                while (nextProcess.remainingTime > 0) {
-                    nextProcess.remainingTime--;
+                lastProcess = curProcess;
+
+                while (curProcess.remainingTime > 0) { // if current process has remaining time, we execute it until an
+                                                       // event occurs, and then we compare the upcoming event with the
+                                                       // current process then we start executing the heighest priority
+                                                       // process
+                    curProcess.remainingTime--;
                     time++;
                     totalExecutionTime++;
 
@@ -152,23 +161,23 @@ public class ProcessSchedulerEventDriven {
                     if (nextEvent != null && nextEvent.type == Event.EventType.ARRIVAL && nextEvent.time <= time) {
                         eventQueue.poll();
                         remainQueue.add(nextEvent.process);
-                        if(remainQueue.peek().processID != nextProcess.processID && nextProcess.remainingTime != 0)
-                        System.out.printf("%d-%d\tP%d\n", startTime, time, nextProcess.processID);
-                                                break;
+                        if (remainQueue.peek().processID != curProcess.processID && curProcess.remainingTime != 0)
+                            System.out.printf("%d-%d\tP%d\n", startTime, time, curProcess.processID);
+                        break;
                     }
                 }
 
-                if (nextProcess.remainingTime == 0) {
-                    nextProcess.setCompletionTime(time);
-                    nextProcess.calculateTurnaroundTime();
-                    nextProcess.calculateWaitingTime();
-                    totalWaitingTime += nextProcess.waitingTime;
-                    totalTurnaroundTime += nextProcess.turnaroundTime;
-                    completed++;
+                if (curProcess.remainingTime == 0) { // when the process is completed, we change its state (event) and
+                                                     // remove it from remainqueue
+                    curProcess.setCompletionTime(time);
+                    curProcess.calculateTurnaroundTime();
+                    curProcess.calculateWaitingTime();
+                    totalWaitingTime += curProcess.waitingTime;
+                    totalTurnaroundTime += curProcess.turnaroundTime;
                     remainQueue.poll();
-                    eventQueue.add(new Event(nextProcess.completionTime, Event.EventType.COMPLETION, nextProcess));
-                    System.out.printf("%d-%d\tP%d\n", startTime, time, nextProcess.processID);
-                } 
+                    eventQueue.add(new Event(curProcess.completionTime, Event.EventType.COMPLETION, curProcess));
+                    System.out.printf("%d-%d\tP%d\n", startTime, time, curProcess.processID);
+                }
             }
         }
 
