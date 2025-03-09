@@ -19,13 +19,19 @@ public class MemorySimulator {
 			}				
 	}
 		
-		 System.out.println("Enter the size of each block:");
+		 System.out.print("Enter the size of each block:");
 	        for (int i = 0; i < n; i++) {
 	            blocks[i] = input.nextInt();
 	        }	
 	        
+	        System.out.println("Enter allocation strategy (1 for first-fit, 2 for best-fit, 3 for worst-fit): ");
+	         int strategy = input.nextInt();
+	       
 
 	        MemoryManager manager = new MemoryManager(blocks);
+	        
+	        System.out.println("Memory blocks are created…");
+	        
 	        
 	        int choice;
 	        do {
@@ -41,8 +47,6 @@ public class MemorySimulator {
 	                    System.out.print("Enter process ID and size: ");
 	                    String processID = input.next();
 	                    int size = input.nextInt();
-	                    System.out.print("Enter allocation strategy (1-First-Fit, 2-Best-Fit, 3-Worst-Fit): ");
-	                    int strategy = input.nextInt();
 	                    manager.allocateMemory(processID, size, strategy);
 	                    break;
 	                case 2:
