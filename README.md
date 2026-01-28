@@ -2,7 +2,7 @@
 
 This project implements an event-driven Shortest Remaining Time First (SRTF) CPU scheduling algorithm using Java. The scheduler simulates process execution based on arrival events, supports context switching, and calculates key performance metrics.
 
- #Features
+ # Features
 	•	Event-driven simulation (ARRIVAL, COMPLETION)
 	•	Shortest Remaining Time First (preemptive)
 	•	Context switching support (1 ms)
